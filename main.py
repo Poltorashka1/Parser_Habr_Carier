@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import csv
 
-CSV = 'vacans.csv'
+
+CSV = 'vacancy.csv'
 ua = UserAgent()
 url = 'https://career.habr.com/vacancies?q=Python&type=all'
 headers = {
@@ -12,7 +13,7 @@ headers = {
 }
 
 
-def get_html(url, params=None, vacansies=None):
+def get_html(url, params=None):
     respons = requests.get(url, headers=headers, params=params)
     return respons
 
@@ -20,9 +21,9 @@ def get_html(url, params=None, vacansies=None):
 def get_content(html):
     soup = BeautifulSoup(html, 'lxml')
     content = soup.find_all('div', class_='vacancy-card__inner')
-    vacans = []
+    vacancy = []
     for item in content:
-        vacans.append(
+        vacancy.append(
             {
                 'Name': item.find('a', class_='vacancy-card__title-link').get_text(),
                 'Company': item.find('a', class_='link-comp--appearance-dark').get_text(),
@@ -31,7 +32,7 @@ def get_content(html):
                 'Date': item.find('time', class_='basic-date').get_text()
             }
         )
-    return vacans
+    return vacancy
 
 
 def save_doc(items, path):
@@ -48,14 +49,14 @@ def main():
     page = int(page)
     html = get_html(url)
     if html.status_code == 200:
-        vacans = []
+        vacancy = []
         for page_ in range(1, page + 1):
             print(f'Loading... {page_} : {page}')
             html = get_html(url, params={'page': page_})
-            vacans.extend(get_content(html.text))
-            save_doc(vacans, CSV)
+            vacancy.extend(get_content(html.text))
+            save_doc(vacancy, CSV)
         count = 1
-        for i in vacans:
+        for i in vacancy:
             print(count, i)
             count += 1
     else:
