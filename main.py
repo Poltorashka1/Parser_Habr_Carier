@@ -51,7 +51,7 @@ def main():
     if html.status_code == 200:
         vacancy = []
         for page_ in range(1, page + 1):
-            print(f'Loading... {page_} : {page}')
+            print(f'Loading... {page_}/{page}')
             html = get_html(url, params={'page': page_})
             vacancy.extend(get_content(html.text))
             save_doc(vacancy, CSV)
